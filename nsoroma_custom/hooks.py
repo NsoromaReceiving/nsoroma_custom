@@ -154,7 +154,8 @@ app_license = "MIT"
 # ------------------------------
 
 override_whitelisted_methods = {
-	"frappe.desk.query_report.run": "nsoroma_custom.overrides.general_ledger.run"
+	"frappe.desk.query_report.run": "nsoroma_custom.overrides.general_ledger.run",
+	"frappe.desk.query_report.export_query": "nsoroma_custom.overrides.general_ledger.export_query",
 }
 
 #

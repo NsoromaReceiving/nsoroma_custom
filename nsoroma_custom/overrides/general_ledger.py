@@ -1,4 +1,8 @@
 import frappe
+import frappe.desk.query_report as _qr
+
+# Hold a reference to the original run before any patching
+_original_run = _qr.run
 
 
 @frappe.whitelist()
@@ -12,9 +16,7 @@ def run(
 	parent_field=None,
 	are_default_filters=True,
 ):
-	from frappe.desk.query_report import run as _run
-
-	result = _run(
+	result = _original_run(
 		report_name=report_name,
 		filters=filters,
 		user=user,
@@ -29,6 +31,18 @@ def run(
 		_inject_je_remarks(result)
 
 	return result
+
+
+@frappe.whitelist()
+def export_query():
+	# _export_query calls run() by name inside the module, bypassing the
+	# whitelisted override. Temporarily swap it so the export picks up our
+	# enriched version, then always restore the original.
+	_qr.run = run
+	try:
+		return _qr.export_query()
+	finally:
+		_qr.run = _original_run
 
 
 def _inject_je_remarks(result):
